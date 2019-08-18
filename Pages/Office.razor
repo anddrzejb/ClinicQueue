@@ -1,0 +1,84 @@
+﻿
+@page "/office/{OfficeId:int}"
+@using ClinicQueue.Data
+@using System.Linq
+
+@if (State.IsLoggedIn)
+{
+    <span>Render doctor side</span>
+    <br />
+    <span>Current number: @CurrentPatinet </span>
+    <br />
+    <span>Next serving: @NextPatient</span>
+    <br />
+    <span>Last number: @LastPatient</span>
+    <br />
+    <button class="btn btn-primary" @onclick="(_ => CurrentRoomQueue.AddNewPatient())">Add patient</button>
+    <button class="btn btn-primary" @onclick="CurrentRoomQueue.MoveNext" disabled="@_nextDisabled">Next patient</button>
+}
+else
+{
+    <span>Render patient side</span>
+    <br />
+    <span>Now serving: @CurrentPatinet</span>
+    <br />
+    <span>Next serving: @NextPatient</span>
+    <br />
+
+}
+<br />
+Total patient count = @CurrentRoomQueue.Line.Count()
+<br />
+Office @OfficeId
+
+@code {
+
+    [Inject] public AppState State { get; set; }
+    [Inject] public ClinicWaitingLists WaitingLists { get; set; }
+
+    [Parameter]
+    public int OfficeId { get; set; }
+
+    public RoomQueue CurrentRoomQueue { get; private set; }
+
+    public string CurrentPatinet { get; set; }
+    public string NextPatient { get; set; }
+    public string LastPatient { get; set; }
+
+    private bool _nextDisabled = true;
+
+    protected override void OnInitialized()
+    {
+        AttachRoomList();
+    }
+
+    protected override void OnAfterRender()
+    {
+        if (OfficeId != CurrentRoomQueue.OfficeId)
+        {
+            AttachRoomList();
+            StateHasChanged();
+        }
+    }
+
+    private void AttachRoomList()
+    {
+        CurrentRoomQueue = WaitingLists.Queues.Where(q => q.OfficeId == OfficeId).SingleOrDefault();
+        CurrentRoomQueue.OnLineChange += RefreshData;
+        CurrentPatinet = CurrentRoomQueue.CurrentPatient;
+        NextPatient = CurrentRoomQueue.NextPatient;
+        LastPatient = CurrentRoomQueue.LastPatient;
+    }
+
+
+    void RefreshData(object sender, EventArgs e)
+    {
+        CurrentPatinet = CurrentRoomQueue.CurrentPatient;
+        NextPatient = CurrentRoomQueue.NextPatient;
+        LastPatient = CurrentRoomQueue.LastPatient;
+        _nextDisabled = NextPatient.Equals("No next patient added");
+
+        InvokeAsync(() => StateHasChanged());
+
+    }
+}
