@@ -37,7 +37,16 @@ namespace ClinicQueue
                 options.UseSqlite(Configuration.GetConnectionString("ConnectionName")));
 
             services.AddDefaultIdentity<IdentityUser>()
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddAuthorization(config =>
+            {
+                config.AddPolicy("CanUpdateQueue", policy => policy.RequireRole("admin", "clerk", "doctor"));
+                config.AddPolicy("CanMoveQueue", policy => policy.RequireRole("admin", "doctor"));
+                config.AddPolicy("IsDoctor", polic => polic.RequireRole("doctor"));
+            });
+
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingAuthenticationStateProvider<IdentityUser>>();
