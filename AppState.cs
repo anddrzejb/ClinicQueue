@@ -7,6 +7,5 @@ namespace ClinicQueue
 {
     public class AppState
     {
-        public bool IsLoggedIn { get; set; }
     }
 }

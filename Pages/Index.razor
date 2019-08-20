@@ -4,13 +4,3 @@
 
 Welcome to your new app.
 <br />
-<button class="btn btn-primary" @onclick="Login">@(State.IsLoggedIn?"Log Out":"Log In")</button>
-
-@code  {
-    [Inject] public AppState State { get; set; }
-
-    void Login()
-    {
-        State.IsLoggedIn = !State.IsLoggedIn;
-    }
-}
