@@ -3,28 +3,20 @@
 @using ClinicQueue.Data
 @using System.Linq
 
-<AuthorizeView>
-    <Authorized>
-        <span>Render doctor side</span>
-        <br />
-        <span>Current number: @CurrentPatinet </span>
-        <br />
-        <span>Next serving: @NextPatient</span>
-        <br />
-        <span>Last number: @LastPatient</span>
-        <br />
-        <button class="btn btn-primary" @onclick="(_ => CurrentRoomQueue.AddNewPatient())">Add patient</button>
-        <button class="btn btn-primary" @onclick="CurrentRoomQueue.MoveNext" disabled="@_nextDisabled">Next patient</button>
-    </Authorized>
-    <NotAuthorized>
-        <span>Render patient side</span>
-        <br />
-        <span>Now serving: @CurrentPatinet</span>
-        <br />
-        <span>Next serving: @NextPatient</span>
-        <br />
 
-    </NotAuthorized>
+<span>Now serving: @CurrentPatinet</span>
+<br />
+<span>Next serving: @NextPatient</span>
+<br />
+
+<AuthorizeView Policy="CanUpdateQueue">
+    <span>Last number: @LastPatient</span>
+    <br />
+    <button class="btn btn-primary" @onclick="(_ => CurrentRoomQueue.AddNewPatient())">Add patient</button>
+</AuthorizeView>
+
+<AuthorizeView Policy="CanMoveQueue">
+    <button class="btn btn-primary" @onclick="CurrentRoomQueue.MoveNext" disabled="@_nextDisabled">Next patient</button>
 </AuthorizeView>
 <br />
 Total patient count = @CurrentRoomQueue.Line.Count()

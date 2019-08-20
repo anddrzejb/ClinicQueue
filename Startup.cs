@@ -42,9 +42,9 @@ namespace ClinicQueue
 
             services.AddAuthorization(config =>
             {
-                config.AddPolicy("CanUpdateQueue", policy => policy.RequireRole("admin", "clerk", "doctor"));
-                config.AddPolicy("CanMoveQueue", policy => policy.RequireRole("admin", "doctor"));
-                config.AddPolicy("IsDoctor", polic => polic.RequireRole("doctor"));
+                config.AddPolicy("CanUpdateQueue", policy => policy.RequireRole("Admin", "Clerk", "Doctor"));
+                config.AddPolicy("CanMoveQueue", policy => policy.RequireRole("Admin", "Doctor"));
+                config.AddPolicy("IsDoctor", polic => polic.RequireRole("Doctor"));
             });
 
             services.AddRazorPages();
