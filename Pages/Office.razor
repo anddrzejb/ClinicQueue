@@ -1,12 +1,14 @@
 ﻿
 @page "/office/{OfficeId:int}"
-@page "/office/{OfficeId:int}/{isAnnoucementMode:bool}"
+@page "/office/{OfficeId:int}/{IsAnnoucementMode:bool}"
+@page "/office/{OfficeId:int}/{IsAnnoucementMode:bool}/{AnnoucementScreenId:int}"
+
 @using ClinicQueue.Data
 @using ClinicQueue.Auth
 @using System.Linq
 
 
-<span>Now serving: @CurrentPatinet</span>
+<span>Now serving: @CurrentPatient</span>
 <br />
 <span>Next serving: @NextPatient</span>
 <br />
@@ -33,22 +35,66 @@ Total patient count = @CurrentRoomQueue.Line.Count()
 Office @OfficeId
 
 @code {
+    public enum ScreenLocation
+    {
+        Both = 0,
+        Right,
+        Left
+    };
+
+
 
     [Inject] public AppState State { get; set; }
     [Inject] public ClinicWaitingLists WaitingLists { get; set; }
+    [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
     [Parameter] public int OfficeId { get; set; }
-    [Parameter] public bool IsAnnoucementMode
+
+    [Parameter]
+    public bool IsAnnoucementMode
     {
         get => State.IsAnnoucementMode;
-        set => State.IsAnnoucementMode = value;
+        set
+        {
+            if (!AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User.Identity.IsAuthenticated)
+                State.IsAnnoucementMode = value;
+            else
+            {
+                State.IsAnnoucementMode = false;
+            }
+        }
     }
 
-    public RoomQueue CurrentRoomQueue { get; private set; }
+    private ScreenLocation _annoucementScreenId; //0
+    [Parameter]
+    public int AnnoucementScreenId
+    {
+        set
+        {
+            if (value != (int)_annoucementScreenId)
+            {
+                _annoucementScreenId = (ScreenLocation)value;
+                if (_annoucementScreenId != ScreenLocation.Both && !IsAnnoucementMode)
+                {
+                    IsAnnoucementMode = true;
+                }
+            }
+        }
+    }
 
-    public string CurrentPatinet { get; set; }
-    public string NextPatient { get; set; }
-    public string LastPatient { get; set; }
+    private RoomQueue CurrentRoomQueue { get; set; }
+
+    private string _currentPatient;
+    private string CurrentPatient
+    {
+        get
+        {
+            return _currentPatient;
+        }
+        set { _currentPatient = value; }
+    }
+    private string NextPatient { get; set; }
+    private string LastPatient { get; set; }
 
     private bool _nextDisabled = true;
 
@@ -70,7 +116,7 @@ Office @OfficeId
     {
         CurrentRoomQueue = WaitingLists.Queues.Where(q => q.OfficeId == OfficeId).SingleOrDefault();
         CurrentRoomQueue.OnLineChange += RefreshData;
-        CurrentPatinet = CurrentRoomQueue.CurrentPatient;
+        CurrentPatient = CurrentRoomQueue.CurrentPatient;
         NextPatient = CurrentRoomQueue.NextPatient;
         LastPatient = CurrentRoomQueue.LastPatient;
     }
@@ -78,7 +124,7 @@ Office @OfficeId
 
     void RefreshData(object sender, EventArgs e)
     {
-        CurrentPatinet = CurrentRoomQueue.CurrentPatient;
+        CurrentPatient = CurrentRoomQueue.CurrentPatient;
         NextPatient = CurrentRoomQueue.NextPatient;
         LastPatient = CurrentRoomQueue.LastPatient;
         _nextDisabled = NextPatient.Equals("No next patient added");
