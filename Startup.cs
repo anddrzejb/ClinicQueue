@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ClinicQueue.Areas.Identity;
 using ClinicQueue.Data;
+using ClinicQueue.Auth;
 
 namespace ClinicQueue
 {
@@ -60,9 +61,9 @@ namespace ClinicQueue
 
             services.AddAuthorization(config =>
             {
-                config.AddPolicy("CanUpdateQueue", policy => policy.RequireRole("Admin", "Clerk", "Doctor"));
-                config.AddPolicy("CanMoveQueue", policy => policy.RequireRole("Admin", "Doctor"));
-                config.AddPolicy("IsDoctor", polic => polic.RequireRole("Doctor"));
+                config.AddPolicy(Policies.CanMoveQueue, Policies.CanMoveQueuePolicy());
+                config.AddPolicy(Policies.CanUpdateQueue, Policies.CanUpdateQueuePolicy());
+                config.AddPolicy(Policies.IsDoctor, Policies.IsDoctorPolicy());
             });
 
             services.AddRazorPages();

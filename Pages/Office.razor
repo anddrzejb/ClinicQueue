@@ -1,6 +1,7 @@
 ﻿
 @page "/office/{OfficeId:int}"
 @using ClinicQueue.Data
+@using ClinicQueue.Auth
 @using System.Linq
 
 
@@ -9,13 +10,13 @@
 <span>Next serving: @NextPatient</span>
 <br />
 
-<AuthorizeView Policy="CanUpdateQueue">
+<AuthorizeView Policy="@Policies.CanUpdateQueue">
     <span>Last number: @LastPatient</span>
     <br />
     <button class="btn btn-primary" @onclick="(_ => CurrentRoomQueue.AddNewPatient())">Add patient</button>
 </AuthorizeView>
 
-<AuthorizeView Policy="CanMoveQueue">
+<AuthorizeView Policy="@Policies.CanMoveQueue">
     <button class="btn btn-primary" @onclick="CurrentRoomQueue.MoveNext" disabled="@_nextDisabled">Next patient</button>
 </AuthorizeView>
 <br />
