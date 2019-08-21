@@ -40,6 +40,24 @@ namespace ClinicQueue
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            services.Configure<IdentityOptions>(options =>
+            {
+                //Password settings
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
+
+                //Lockout settings
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
+                options.Lockout.MaxFailedAccessAttempts = 10;
+                options.Lockout.AllowedForNewUsers = true;
+
+                //User settings
+                options.User.RequireUniqueEmail = true;
+            });
+
             services.AddAuthorization(config =>
             {
                 config.AddPolicy("CanUpdateQueue", policy => policy.RequireRole("Admin", "Clerk", "Doctor"));
