@@ -1,5 +1,6 @@
 ﻿
 @page "/office/{OfficeId:int}"
+@page "/office/{OfficeId:int}/{isAnnoucementMode:bool}"
 @using ClinicQueue.Data
 @using ClinicQueue.Auth
 @using System.Linq
@@ -19,10 +20,15 @@
 <AuthorizeView Policy="@Policies.CanMoveQueue">
     <button class="btn btn-primary" @onclick="CurrentRoomQueue.MoveNext" disabled="@_nextDisabled">Next patient</button>
 </AuthorizeView>
+
 <br />
 Total patient count = @CurrentRoomQueue.Line.Count()
 <br />
-
+<AuthorizeView>
+    <NotAuthorized>
+        <button class="btn btn-primary" @onclick="@(_ => IsAnnoucementMode = true)" hidden="@IsAnnoucementMode">Full screen</button>
+    </NotAuthorized>
+</AuthorizeView>
 
 Office @OfficeId
 
@@ -31,8 +37,12 @@ Office @OfficeId
     [Inject] public AppState State { get; set; }
     [Inject] public ClinicWaitingLists WaitingLists { get; set; }
 
-    [Parameter]
-    public int OfficeId { get; set; }
+    [Parameter] public int OfficeId { get; set; }
+    [Parameter] public bool IsAnnoucementMode
+    {
+        get => State.IsAnnoucementMode;
+        set => State.IsAnnoucementMode = value;
+    }
 
     public RoomQueue CurrentRoomQueue { get; private set; }
 

@@ -7,5 +7,21 @@ namespace ClinicQueue
 {
     public class AppState
     {
+        private bool _isAnnoucementMode;
+
+        public event EventHandler AnnoucementMode;
+
+        public bool IsAnnoucementMode
+        {
+            get { return _isAnnoucementMode; }
+            set 
+            {
+                if (_isAnnoucementMode != value)
+                {
+                    _isAnnoucementMode = value;
+                    AnnoucementMode(this, EventArgs.Empty);
+                }
+            }
+        }
     }
 }
