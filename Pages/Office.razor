@@ -89,7 +89,19 @@ Office @OfficeId
     {
         get
         {
-            return _currentPatient;
+            if (_annoucementScreenId == ScreenLocation.Both)
+                return _currentPatient;
+            else
+            {
+                if (_annoucementScreenId == ScreenLocation.Right)
+                {
+                    return _currentPatient.Substring(0, 2);
+                }
+                else
+                {
+                    return _currentPatient.Substring(2, (_currentPatient.Length==3?1:2));
+                }
+            }
         }
         set { _currentPatient = value; }
     }
