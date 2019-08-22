@@ -13,8 +13,8 @@ namespace ClinicQueue.Data
         {
             Queues = new List<RoomQueue>
             {
-                new RoomQueue(1, "AB"),
-                new RoomQueue(2, "BM")
+                new RoomQueue(1, "G1"),
+                new RoomQueue(2, "G2")
             };
         }
     }

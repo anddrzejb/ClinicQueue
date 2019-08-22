@@ -58,7 +58,7 @@ namespace ClinicQueue.Data
         {
             if (string.IsNullOrEmpty(code))
             {
-                code = _officeCode;
+                //code = _officeCode;
             }
             if (order == 0)
             {
@@ -67,7 +67,8 @@ namespace ClinicQueue.Data
                 else if (CurrentKey > 0)
                     order = CurrentKey;
             }
-            code = $"{code}{++order}";
+            //code = $"{code}{++order}";
+            code = (++order).ToString().PadLeft(2);
             Line.Add(order, code);
             OnLineChange(this, EventArgs.Empty);
         }

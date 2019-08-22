@@ -8,16 +8,27 @@
 @using System.Linq
 
 
-<span>Now serving: @CurrentPatient</span>
-<br />
-<span>Next serving: @NextPatient</span>
-<br />
+<AuthorizeView>
+    <NotAuthorized>
+        <div style="@(IsAnnoucementMode?"height: 90vh; width: 95vw;":"")">
+            <p style="@(IsAnnoucementMode?$"line-height: normal; font-size:{90/_splitSize}vh;text-align: center;":"")">@((IsAnnoucementMode?"":"Now serving:") + CurrentPatient)</p>
+        </div>
+        <br />
+        <span>Next serving: @NextPatient</span>
+        <br />
 
-<AuthorizeView Policy="@Policies.CanUpdateQueue">
-    <span>Last number: @LastPatient</span>
-    <br />
-    <button class="btn btn-primary" @onclick="(_ => CurrentRoomQueue.AddNewPatient())">Add patient</button>
+    </NotAuthorized>
 </AuthorizeView>
+
+    <AuthorizeView Policy="@Policies.CanUpdateQueue">
+        <span>Now serving: @CurrentPatient</span>
+        <br />
+        <span>Next serving: @NextPatient</span>
+        <br />
+        <span>Last number: @LastPatient</span>
+        <br />
+        <button class="btn btn-primary" @onclick="(_ => CurrentRoomQueue.AddNewPatient())">Add patient</button>
+    </AuthorizeView>
 
 <AuthorizeView Policy="@Policies.CanMoveQueue">
     <button class="btn btn-primary" @onclick="CurrentRoomQueue.MoveNext" disabled="@_nextDisabled">Next patient</button>
@@ -56,7 +67,7 @@ Office @OfficeId
         get => State.IsAnnoucementMode;
         set
         {
-            if (!AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User.Identity.IsAuthenticated)
+            if (!HasActiveUser)
                 State.IsAnnoucementMode = value;
             else
             {
@@ -84,6 +95,10 @@ Office @OfficeId
 
     private RoomQueue CurrentRoomQueue { get; set; }
 
+    public bool HasActiveUser {
+        get => AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User.Identity.IsAuthenticated;
+    }
+
     private string _currentPatient;
     private string CurrentPatient
     {
@@ -93,13 +108,14 @@ Office @OfficeId
                 return _currentPatient;
             else
             {
+                _splitSize = _currentPatient.Length / 2;
                 if (_annoucementScreenId == ScreenLocation.Right)
                 {
-                    return _currentPatient.Substring(0, 2);
+                    return _currentPatient.Substring(0, _splitSize);
                 }
                 else
                 {
-                    return _currentPatient.Substring(2, (_currentPatient.Length==3?1:2));
+                    return _currentPatient.Substring(_splitSize, _splitSize);
                 }
             }
         }
@@ -109,6 +125,8 @@ Office @OfficeId
     private string LastPatient { get; set; }
 
     private bool _nextDisabled = true;
+    private int _splitSize = 1;
+
 
     protected override void OnInitialized()
     {
