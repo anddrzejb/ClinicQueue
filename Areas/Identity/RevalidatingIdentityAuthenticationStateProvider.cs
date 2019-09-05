@@ -2,7 +2,7 @@ using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -15,7 +15,7 @@ namespace ClinicQueue.Areas.Identity
     /// stamp changes, this revalidation mechanism will sign the user out.
     /// </summary>
     /// <typeparam name="TUser">The type encapsulating a user.</typeparam>
-    public class RevalidatingAuthenticationStateProvider<TUser>
+    public class RevalidatingIdentityAuthenticationStateProvider<TUser>
         : AuthenticationStateProvider, IDisposable where TUser : class
     {
         private readonly static TimeSpan RevalidationInterval = TimeSpan.FromMinutes(30);
@@ -25,10 +25,10 @@ namespace ClinicQueue.Areas.Identity
         private readonly ILogger _logger;
         private Task<AuthenticationState> _currentAuthenticationStateTask;
 
-        public RevalidatingAuthenticationStateProvider(
+        public RevalidatingIdentityAuthenticationStateProvider(
             IServiceScopeFactory scopeFactory,
             SignInManager<TUser> circuitScopeSignInManager,
-            ILogger<RevalidatingAuthenticationStateProvider<TUser>> logger)
+            ILogger<RevalidatingIdentityAuthenticationStateProvider<TUser>> logger)
         {
             var initialUser = circuitScopeSignInManager.Context.User;
             _currentAuthenticationStateTask = Task.FromResult(new AuthenticationState(initialUser));

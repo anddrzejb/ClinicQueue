@@ -133,7 +133,7 @@ Office @OfficeId
         AttachRoomList();
     }
 
-    protected override void OnAfterRender()
+    protected override void OnAfterRender(bool firstRender)
     {
         if (OfficeId != CurrentRoomQueue.OfficeId)
         {

@@ -2,7 +2,7 @@ using ClinicQueue.Areas.Identity;
 using ClinicQueue.Auth;
 using ClinicQueue.Data;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -60,7 +60,7 @@ namespace ClinicQueue
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddScoped<AuthenticationStateProvider, RevalidatingAuthenticationStateProvider<IdentityUser>>();
+            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 
             services.AddScoped(typeof(AppState));
             services.AddSingleton<ClinicWaitingLists>();
@@ -92,7 +92,7 @@ namespace ClinicQueue
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapBlazorHub<App>(selector: "app");
+                endpoints.MapBlazorHub();                
                 endpoints.MapFallbackToPage("/_Host");
             });
         }
